@@ -1,0 +1,8 @@
+.popup_with_image {
+  background-color: rgba(0, 0, 0, .9);
+}
+
+.popup_with_image .popup__close-button {
+  top: -40px;
+  right: -40px;
+}

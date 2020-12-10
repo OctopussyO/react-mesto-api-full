@@ -1,0 +1,12 @@
+.page__button {
+  transition: .2s linear;
+}
+
+.page__button:hover {
+  cursor: pointer;
+  opacity: .6;
+}
+
+.page__button:focus {
+  outline: none;
+}

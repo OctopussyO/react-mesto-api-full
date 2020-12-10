@@ -1,0 +1,10 @@
+.card__button_act_like {
+  padding: 0;
+  width: 20px;
+  height: 18px;
+  margin-bottom: 4px;
+}
+
+.card__button_act_like svg {
+  fill: none;
+}

@@ -1,0 +1,26 @@
+.card__button_act_enlarge-image {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+}
+
+/* Этот псевдоэлемент добавлен, чтобы иконка корзины не терялась на фоне изображения.
+Например, это очень хорошо видно на фото из Судака, если убрать оверлей. 
+Т.к. неизвестно, какую картику загрузит пользователь, считаю это необходимым, хотя
+такого требования и не было в макете.*/
+.card__button_act_enlarge-image::before {
+  content: '';
+  width: 100%;
+  padding-bottom: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #2A2C2F;
+  opacity: .15;
+  z-index: 2;
+  transition: opacity .2s ease-in-out;
+}
+
+.card__button_act_enlarge-image:hover::before {
+  opacity: .05;
+}

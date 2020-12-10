@@ -1,0 +1,17 @@
+.header__button_content_image {
+  width: 24px;
+  height: 24px;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  display: none;
+}
+
+@media screen and (max-width: 600px) {
+  .header__button_content_image {
+    margin-right: 30px;
+    display: block;
+    grid-area: button;
+  }
+}

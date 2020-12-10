@@ -1,0 +1,10 @@
+@import url(./_with/popup__container_with_form.css);
+@import url(./_with/popup_container_with_tooltip.css);
+
+.popup__container {
+  position: relative;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}

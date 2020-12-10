@@ -1,0 +1,20 @@
+@import url(./_act/card__button_act_delete.css);
+@import url(./_act/card__button_act_like.css);
+@import url(./_act/card__button_act_enlarge-image.css);
+@import url(./_active/card__button_active.css);
+
+.card__button {
+  border: none;
+  background-color: transparent;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.card__button:hover {
+  cursor: pointer;
+}
+
+.card__button:focus {
+  outline: none;
+}

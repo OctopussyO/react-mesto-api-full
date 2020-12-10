@@ -1,0 +1,17 @@
+@import url(./_act/form__submit-btn_act_identification.css);
+@import url(./_act/form__submit-btn_act_activity.css);
+@import url(./_theme/form__submit-btn_theme_light.css);
+@import url(./_blocked/form__submit-btn_blocked.css);
+@import url(./_unblocked/form__submit-btn_unblocked.css);
+
+.form__submit-btn {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 2px;
+  transition: background-color .2s linear;
+}
+
+.form__submit-btn:focus {
+  outline: none;
+}

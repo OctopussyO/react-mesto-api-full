@@ -1,0 +1,14 @@
+.form__submit-btn_blocked {
+  background-color: transparent;
+  opacity: .2;
+}
+
+.form_theme_dark > .form__submit-btn_blocked {
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.form_theme_light > .form__submit-btn_blocked {
+  color: #000;
+  border: 1px solid #000;
+}

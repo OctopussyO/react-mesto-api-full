@@ -1,0 +1,7 @@
+@import url(./_act/form__fieldset_act_activity.css);
+@import url(./_act/form__fieldset_act_identification.css);
+
+.form__fieldset {
+  padding: 0;
+  border: none;
+}

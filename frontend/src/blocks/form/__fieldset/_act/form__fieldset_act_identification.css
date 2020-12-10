@@ -1,0 +1,9 @@
+.form__fieldset_act_identification {
+  margin: 0 0 202px;
+}
+
+@media screen and (max-width: 600px) {
+  .form__fieldset_act_identification {
+    margin-bottom: 158px;
+  }
+}

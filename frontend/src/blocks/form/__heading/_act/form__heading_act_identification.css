@@ -1,0 +1,12 @@
+.form__heading_act_identification {
+  margin-bottom: 42px;
+  text-align: center;
+  font-size: 24px;
+}
+
+@media screen and (max-width: 600px) { 
+  .form__heading_act_identification {
+    margin-bottom: 34px;
+    font-size: 20px;
+  }
+}

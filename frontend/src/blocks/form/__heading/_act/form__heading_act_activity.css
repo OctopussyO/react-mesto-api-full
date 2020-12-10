@@ -1,0 +1,11 @@
+.form__heading_act_activity {
+  margin-bottom: 42px;
+  font-size: 24px;
+}
+
+@media screen and (max-width: 600px) {
+  .form__heading_act_activity {
+    margin-bottom: 18px;
+    font-size: 18px;
+  }
+}

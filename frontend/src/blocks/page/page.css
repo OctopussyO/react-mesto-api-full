@@ -1,0 +1,9 @@
+@import url(./__container/page__container.css);
+@import url(./__narrow/page__narrow.css);
+@import url(./__button/page__button.css);
+@import url(./__link/page__link.css);
+
+.page {
+  background-color: #000;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+}

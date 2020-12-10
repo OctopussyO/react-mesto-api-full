@@ -1,0 +1,11 @@
+.form__submit-btn_unblocked:hover {
+  cursor: pointer;
+}
+
+.form_theme_dark > .form__submit-btn_unblocked:hover {
+  background-color: #ffffff95;
+}
+
+.form_theme_light > .form__submit-btn_unblocked:hover {
+  background-color: #00000085;
+}

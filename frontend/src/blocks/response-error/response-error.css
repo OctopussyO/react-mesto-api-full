@@ -1,0 +1,8 @@
+@import url(./__status/response-error__status.css);
+@import url(./__text/response-error__text.css);
+@import url(./_hidden/response-error_hidden.css);
+
+.response-error {
+  color: #fff;
+  text-align: center;
+}

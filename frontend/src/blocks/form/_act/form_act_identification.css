@@ -1,0 +1,13 @@
+.form_act_identification {
+  margin: auto;
+  box-sizing: border-box;
+  padding: 20px 30px 15px;
+  max-width: 418px;
+}
+
+@media screen and (max-width: 600px) {
+  .form_act_identification {
+    padding-top: 0;
+    padding-bottom: 20px;
+  }
+}

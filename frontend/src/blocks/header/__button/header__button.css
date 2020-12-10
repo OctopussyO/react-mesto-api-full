@@ -1,0 +1,17 @@
+@import url(./_content/header__button_content_image.css);
+@import url(./_content/header__button_content_text.css);
+
+.header__button {
+  background-color: transparent;
+  border: none;
+  transition: opacity .2s linear;
+}
+
+.header__button:hover {
+  opacity: .5;
+  cursor: pointer;
+}
+
+.header__button:focus {
+  outline: none;
+}

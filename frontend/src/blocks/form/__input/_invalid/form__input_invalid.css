@@ -1,0 +1,4 @@
+.form__fieldset_theme_light > .form__input_invalid,
+.form__fieldset_theme_dark > .form__input_invalid {
+  border-color: #f00;
+}

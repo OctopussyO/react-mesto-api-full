@@ -1,0 +1,21 @@
+.header__user-info {
+  width: 100%;
+  text-align: end;
+  margin-left: 24px;
+  margin-right: 24px;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 600px) {
+  .header__user-info {
+    margin: 14px 0 16px;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-sizing: border-box;
+  }
+}

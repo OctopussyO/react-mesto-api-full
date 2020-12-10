@@ -1,0 +1,7 @@
+.gallery {
+  width: 100%;
+  display: -ms-grid;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(232px, 1fr));
+  grid-gap: 21px 18px;
+}

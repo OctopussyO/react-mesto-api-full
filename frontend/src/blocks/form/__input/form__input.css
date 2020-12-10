@@ -1,0 +1,25 @@
+@import url(./_act/form__input_act_activity.css);
+@import url(./_act/form__input_act_identification.css);
+@import url(./_theme/form__input_theme_dark.css);
+@import url(./_valid/form__input_valid.css);
+@import url(./_invalid/form__input_invalid.css);
+
+.form__input {
+  width: 100%;
+  height: 34px;
+  padding-left: 0;
+  padding-right: 0;
+  background-color: transparent;
+  border: none;
+  box-sizing: border-box;
+  border-bottom: 1px solid;
+  margin-bottom: 2px;
+}
+
+.form__input:last-of-type {
+  margin-bottom: 0;
+}
+
+.form__input:focus {
+  outline: none;
+}

@@ -1,0 +1,17 @@
+.popup_with_form {
+  padding-left: 40px;
+  padding-right: 40px;
+  background-color: rgba(0, 0, 0, .5);
+}
+
+.popup_with_form .popup__close-button {
+  top: -36px;
+  right: -36px;
+}
+
+@media screen and (max-width: 600px) {
+  .popup_with_form .popup__close-button {
+    top: -30px;
+    right: -28px;
+  }
+}

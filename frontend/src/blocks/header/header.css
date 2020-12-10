@@ -1,0 +1,37 @@
+@import url(./__logo/header__logo.css);
+@import url(./__link/header__link.css);
+@import url(./__control/header__control.css);
+@import url(./__control/_mobile/header__control_mobile_hidden.css);
+@import url(./__user-info/header__user-info.css);
+@import url(./__button/header__button.css);
+
+.header {
+  width: calc(100% + 2 * 19px);
+  max-width: 882px;
+  padding-top: 34px;
+  padding-bottom: 28px;
+  box-sizing: border-box;
+  border-bottom: 1px solid rgba(84, 84, 84, .7);
+  margin: 0 auto 40px;
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  align-items: center;
+}
+
+@media screen and (max-width: 920px) {
+  .header {
+    width: 100%;
+    padding-left: 19px;
+    padding-right: 19px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .header {
+    padding: 28px 0 30px;
+    grid-template-rows: repeat(2, min-content);
+    grid-template-columns: 1fr min-content;
+    grid-template-areas:  'control control'
+                          ' logo    button';
+  }
+}

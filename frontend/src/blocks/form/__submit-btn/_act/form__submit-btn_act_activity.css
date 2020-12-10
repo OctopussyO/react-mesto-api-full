@@ -1,0 +1,11 @@
+.form__submit-btn_act_activity {
+  height: 50px;
+  font-size: 18px;
+}
+
+@media screen and (max-width: 600px) {
+  .form__submit-btn_act_activity {
+    height: 40px;
+    font-size: 14px;
+  }
+}

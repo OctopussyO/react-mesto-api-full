@@ -1,0 +1,10 @@
+.header__link {
+  justify-self: end;
+  font-size: 18px;
+}
+
+@media screen and (max-width: 600px) {
+  .header__link {
+    font-size: 14px;
+  }
+}

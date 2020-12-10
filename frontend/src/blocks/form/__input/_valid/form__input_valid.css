@@ -1,0 +1,7 @@
+.form__fieldset_theme_light > .form__input_valid {
+  border-color: #00000020;
+}
+
+.form__fieldset_theme_dark .form__input_valid {
+  border-color: #ccc;
+}

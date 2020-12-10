@@ -1,0 +1,25 @@
+.popup_with_tooltip {
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: rgba(0, 0, 0, .5);
+}
+
+.popup_with_tooltip .popup__close-button {
+  top: -40px;
+  right: -40px;
+}
+
+@media screen and (max-width: 600px) {
+  .popup_with_tooltip .popup__close-button {
+    top: -30px;
+    right: -28px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .popup_with_tooltip .popup__close-button {
+    transform: translateX(-50%);
+    top: -60px;
+    left: 50%;
+  }
+}

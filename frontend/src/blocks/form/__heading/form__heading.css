@@ -1,0 +1,9 @@
+@import url(./_theme/form__heading_theme_dark.css);
+@import url(./_act/form__heading_act_identification.css);
+@import url(./_act/form__heading_act_activity.css);
+
+.form__heading {
+  margin-top: 0;
+  line-height: 1.2;
+  font-weight: 900;
+}
