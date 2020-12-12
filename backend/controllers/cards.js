@@ -12,7 +12,7 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.createCard = (req, res) => {
-  Card.create({ owner: req.user, ...req.body })
+  Card.create({ owner: req.user.id, ...req.body })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -23,25 +23,36 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  const { id } = req.params;
-  Card.findByIdAndRemove(id)
-    .orFail(new Error('NotExistId'))
-    .then((card) => res.status(200).send(card))
-    .catch((err) => {
-      if (err.message === 'NotExistId') {
-        res.status(404).send({ message: 'Нет карточки с таким id' });
-      } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Введён неверный id' });
-      } else {
-        res.status(500).send({ message: 'Ошибка на сервере' });
+  const userId = req.user.id;
+  const cardId = req.params.id;
+
+  Card.findById(cardId)
+    .then((card) => {
+      const cardOwnerId = card.owner.toString();
+
+      if (cardOwnerId !== userId) {
+        return res.status(403).send({ message: 'Карточка принадлежит другому пользователю' });
       }
+
+      return Card.findByIdAndRemove(cardId)
+        .orFail(new Error('NotExistId'))
+        .then((deletedCard) => res.status(200).send(deletedCard))
+        .catch((err) => {
+          if (err.message === 'NotExistId') {
+            res.status(404).send({ message: 'Нет карточки с таким id' });
+          } else if (err.name === 'CastError') {
+            res.status(400).send({ message: 'Введён неверный id' });
+          } else {
+            res.status(500).send({ message: 'Ошибка на сервере' });
+          }
+        });
     });
 };
 
 module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.id,
-    { $addToSet: { likes: req.user._id } },
+    { $addToSet: { likes: req.user.id } },
     { new: true },
   )
     .orFail(new Error('NotExistId'))
@@ -60,7 +71,7 @@ module.exports.likeCard = (req, res) => {
 module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.id,
-    { $pull: { likes: req.user._id } },
+    { $pull: { likes: req.user.id } },
     { new: true },
   )
     .orFail(new Error('NotExistId'))
