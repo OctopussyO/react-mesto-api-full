@@ -12,7 +12,7 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  const { id } = req.params;
+  const { id } = req.user;
   User.findById(id)
     .orFail(new Error('NotExistId'))
     .then((user) => res.send(user))
