@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const { SALT_ROUND } = require('../configs');
-const { getJwt } = require('../utils/getJwt');
+const { getJwt } = require('../utils/jwt');
 
 module.exports.getUsers = (req, res) => {
   User.find()
