@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const { SALT_ROUND } = require('../configs');
+const { getJwt } = require('../utils/getJwt');
 
 module.exports.getUsers = (req, res) => {
   User.find()
@@ -33,20 +34,23 @@ module.exports.createUser = (req, res) => {
     return res.status(400).send({ message: 'Невалидные данные' });
   }
 
-  return User.findOne({ email }).then((user) => {
-    if (user) {
-      return res.status(409).send({ message: 'Пользователь с таким email уже существует' });
-    }
+  return User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        return res.status(409).send({ message: 'Пользователь с таким email уже существует' });
+      }
 
-    return bcrypt.hash(password, SALT_ROUND);
-  })
+      return bcrypt.hash(password, SALT_ROUND);
+    })
     .then((hash) => {
       User.create({ email, password: hash })
-        .then(({
-          _id, name, about, avatar, email,
-        }) => {
+        .then((newUser) => {
           res.status(200).send({
-            _id, name, about, avatar, email,
+            _id: newUser._id,
+            name: newUser.name,
+            about: newUser.about,
+            avatar: newUser.avatar,
+            email: newUser.email,
           });
         })
         .catch((err) => {
@@ -87,9 +91,6 @@ module.exports.updateUserAvatar = (req, res) => {
     req.user._id,
     { avatar },
     {
-      // Флаг new позволяет вернуть обновлённые данные, а не создаёт нового пользователя.
-      // Для создания нового пользователя при его отсутствии потребовалось бы использовать
-      // флаг upsert
       new: true,
       runValidators: true,
     },
@@ -104,5 +105,28 @@ module.exports.updateUserAvatar = (req, res) => {
       } else {
         res.status(500).send({ message: 'Ошибка на сервере' });
       }
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password || !password.trim()) {
+    return res.status(400).send({ message: 'Невалидные данные' });
+  }
+
+  return User.findUserByCredentials({ email, password })
+    .then((foundUser) => {
+      const token = getJwt(foundUser._id);
+      return res.status(200).send({ token });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(400).send({ message: 'Введённые данные не прошли валидацию' });
+      }
+      if (err.message === 'Unauthorized') {
+        return res.status(401).send({ message: 'Неверный email или пароль' });
+      }
+      return res.status(500).send({ message: 'Ошибка на сервере' });
     });
 };

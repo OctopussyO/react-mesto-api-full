@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const isEmail = require('validator/lib/isEmail');
 const urlRegex = require('../utils/urlRegex');
 
@@ -38,6 +39,26 @@ const userSchema = new mongoose.Schema({
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
 });
+
+userSchema.statics.findUserByCredentials = function (user) {
+  const { email, password } = user;
+
+  return this.findOne({ email })
+    .then((foundUser) => {
+      if (!foundUser) {
+        return Promise.reject(new Error('Unauthorized'));
+      }
+
+      return bcrypt.compare(password, foundUser.password)
+        .then((matched) => {
+          if (!matched) {
+            return Promise.reject(new Error('Unauthorized'));
+          }
+
+          return foundUser;
+        });
+    });
+};
 
 const userModel = mongoose.model('user', userSchema);
 
