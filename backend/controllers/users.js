@@ -1,4 +1,6 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const { SALT_ROUND } = require('../configs');
 
 module.exports.getUsers = (req, res) => {
   User.find()
@@ -25,13 +27,34 @@ module.exports.getUser = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  User.create({ ...req.body })
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Введённые данные не прошли валидацию' });
-      }
-      return res.status(500).send({ message: 'Ошибка на сервере' });
+  const { email, password } = req.body;
+
+  if (!email || !password || !password.trim()) {
+    return res.status(400).send({ message: 'Невалидные данные' });
+  }
+
+  return User.findOne({ email }).then((user) => {
+    if (user) {
+      return res.status(409).send({ message: 'Пользователь с таким email уже существует' });
+    }
+
+    return bcrypt.hash(password, SALT_ROUND);
+  })
+    .then((hash) => {
+      User.create({ email, password: hash })
+        .then(({
+          _id, name, about, avatar, email,
+        }) => {
+          res.status(200).send({
+            _id, name, about, avatar, email,
+          });
+        })
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            return res.status(400).send({ message: 'Введённые данные не прошли валидацию' });
+          }
+          return res.status(500).send({ message: 'Ошибка на сервере' });
+        });
     });
 };
 
