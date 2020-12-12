@@ -10,7 +10,7 @@ class Auth  {
   }
 
   register(data) {
-    return fetch(`${this._baseUrl}/signup`, {
+    return fetch(`${this._baseUrl}/sign-up`, {
       method: 'POST',
       headers: {
         "Content-Type": "application/json"
@@ -21,7 +21,7 @@ class Auth  {
   }
 
   login(data) {
-    return fetch(`${this._baseUrl}/signin`, {
+    return fetch(`${this._baseUrl}/sign-in`, {
       method: 'POST',
       headers: {
         "Content-Type": "application/json"
