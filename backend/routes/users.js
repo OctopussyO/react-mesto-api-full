@@ -12,9 +12,9 @@ router.get('/users', getUsers);
 
 router.get('/users/:id', getUser);
 
-router.post('/users', createUser);
+router.post('/signup', createUser);
 
-router.post('/login', login);
+router.post('/sugnin', login);
 
 router.patch('/users/me', updateUserData);
 
