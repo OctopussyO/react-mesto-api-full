@@ -4,7 +4,8 @@ const bodyParser = require('body-parser');
 const routes = require('./routes/index');
 const { auth } = require('./middlewares/auth');
 const { createUser, login } = require('./controllers/users');
-const { NotFoundError } = require('./errors');
+const { NotFoundError } = require('./errors/not-found-error');
+const { errorHandler } = require('./middlewares/error-handler');
 
 const { PORT = 3000 } = process.env;
 
@@ -35,18 +36,6 @@ app.use('*', () => {
 });
 
 // Централизованный обработчик ошибок
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'Ошибка на сервере'
-        : message,
-    });
-
-  next();
-});
+app.use(errorHandler);
 
 app.listen(PORT);
