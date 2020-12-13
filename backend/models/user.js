@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     unique: true,
-    required: true,
+    required: [true, 'Это поле обязательно'],
     validate: {
       validator: (v) => isEmail(v),
       message: 'Email введён некорректно.',
@@ -16,20 +16,20 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    minlength: 6,
-    required: true,
+    minlength: [6, 'Пароль должен содержать не менее 6 символов'],
+    required: [true, 'Это поле обязательно'],
     select: false,
   },
   name: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'Имя должно содержать не менее 2 символов'],
+    maxlength: [30, 'Имя должно содержать не более 30 символов'],
     default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'Это поле должно содержать не менее 2 символов'],
+    maxlength: [30, 'Это поле должно содержать не менее 30 символов'],
     default: 'Исследователь',
   },
   avatar: {

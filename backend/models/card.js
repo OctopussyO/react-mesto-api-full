@@ -4,13 +4,13 @@ const urlRegex = require('../utils/urlRegex');
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'Название должно содержать не менее 2 символов'],
+    maxlength: [30, 'Название должно содержать не менее 30 символов'],
     required: true,
   },
   link: {
     type: String,
-    required: true,
+    required: [true, 'Это поле обязательно'],
     validate: {
       validator: (v) => urlRegex.test(v),
       message: 'Ссылка на изображение введена некорректно.',
