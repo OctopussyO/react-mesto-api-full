@@ -1,3 +1,4 @@
+const User = require('../models/user');
 const { verifyJwt } = require('../utils/jwt');
 
 const auth = async (req, res, next) => {
@@ -15,9 +16,16 @@ const auth = async (req, res, next) => {
     return res.status(401).send({ message: 'Необходима авторизация' });
   }
 
-  req.user = payload;
+  return User.findById(payload.id)
+    .then((user) => {
+      if (!user) {
+        return res.status(401).send({ message: 'Необходима авторизация' });
+      }
 
-  return next();
+      req.user = payload;
+
+      return next();
+    });
 };
 
 module.exports = {
