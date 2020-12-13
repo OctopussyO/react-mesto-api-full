@@ -1,28 +1,20 @@
+const { NotFoundError, ForbiddenError } = require('../errors');
 const Card = require('../models/card');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find()
+    .orFail(new NotFoundError('Невозможно получить список карточек'))
     .then((data) => res.send(data))
-    .catch(() => {
-      // Обработка 404 тут не нужна, т.к. пользователь ничего не вводит
-      // и несуществовать файл может только при ошибке разработчика, если
-      // ввести неверное имя модели. При этом сервер вернёт пустой массив.
-      res.status(500).send({ message: 'Ошибка на сервере' });
-    });
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   Card.create({ owner: req.user.id, ...req.body })
     .then((card) => res.status(200).send(card))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Введённые данные не прошли валидацию' });
-      }
-      return res.status(500).send({ message: 'Ошибка на сервере' });
-    });
+    .catch(next);
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   const userId = req.user.id;
   const cardId = req.params.id;
 
@@ -31,58 +23,34 @@ module.exports.deleteCard = (req, res) => {
       const cardOwnerId = card.owner.toString();
 
       if (cardOwnerId !== userId) {
-        return res.status(403).send({ message: 'Карточка принадлежит другому пользователю' });
+        throw new ForbiddenError('Карточка принадлежит другому пользователю');
       }
 
       return Card.findByIdAndRemove(cardId)
-        .orFail(new Error('NotExistId'))
+        .orFail(new NotFoundError('Нет карточки с таким id'))
         .then((deletedCard) => res.status(200).send(deletedCard))
-        .catch((err) => {
-          if (err.message === 'NotExistId') {
-            res.status(404).send({ message: 'Нет карточки с таким id' });
-          } else if (err.name === 'CastError') {
-            res.status(400).send({ message: 'Введён неверный id' });
-          } else {
-            res.status(500).send({ message: 'Ошибка на сервере' });
-          }
-        });
+        .catch(next);
     });
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user.id } },
     { new: true },
   )
-    .orFail(new Error('NotExistId'))
+    .orFail(new NotFoundError('Нет карточки с таким id'))
     .then((card) => res.status(200).send(card))
-    .catch((err) => {
-      if (err.message === 'NotExistId') {
-        res.status(404).send({ message: 'Нет карточки с таким id' });
-      } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Неверный формат id' });
-      } else {
-        res.status(500).send({ message: 'Ошибка на сервере' });
-      }
-    });
+    .catch(next);
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $pull: { likes: req.user.id } },
     { new: true },
   )
-    .orFail(new Error('NotExistId'))
+    .orFail(new NotFoundError('Нет карточки с таким id'))
     .then((card) => res.status(200).send(card))
-    .catch((err) => {
-      if (err.message === 'NotExistId') {
-        res.status(404).send({ message: 'Нет карточки с таким id' });
-      } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Неверный формат id' });
-      } else {
-        res.status(500).send({ message: 'Ошибка на сервере' });
-      }
-    });
+    .catch(next);
 };

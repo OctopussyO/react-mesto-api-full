@@ -1,31 +1,34 @@
 const User = require('../models/user');
 const { verifyJwt } = require('../utils/jwt');
+const UnauthorizedError = require('../errors/unauthorized-error');
 
 const auth = async (req, res, next) => {
   const { authorization } = req.headers;
 
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res.status(401).send({ message: 'Необходима авторизация' });
-  }
+  try {
+    if (!authorization || !authorization.startsWith('Bearer ')) {
+      throw new UnauthorizedError('Необходима авторизация');
+    }
 
-  const token = authorization.replace('Bearer ', '');
+    const token = authorization.replace('Bearer ', '');
 
-  const payload = await verifyJwt(token);
+    const payload = await verifyJwt(token);
 
-  if (!payload) {
-    return res.status(401).send({ message: 'Необходима авторизация' });
-  }
+    if (!payload) {
+      throw new UnauthorizedError('Необходима авторизация');
+    }
 
-  return User.findById(payload.id)
-    .then((user) => {
-      if (!user) {
-        return res.status(401).send({ message: 'Необходима авторизация' });
-      }
+    await User.findById(payload.id)
+      .then((user) => {
+        if (!user) {
+          throw new UnauthorizedError('Необходима авторизация');
+        }
 
-      req.user = payload;
+        req.user = payload;
+      });
+  } catch (err) { next(err); }
 
-      return next();
-    });
+  return next();
 };
 
 module.exports = {

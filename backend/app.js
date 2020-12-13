@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const routes = require('./routes/index');
 const { auth } = require('./middlewares/auth');
 const { createUser, login } = require('./controllers/users');
+const { NotFoundError } = require('./errors');
 
 const { PORT = 3000 } = process.env;
 
@@ -29,8 +30,8 @@ app.post('/signup', createUser);
 app.post('/signin', login);
 
 app.use('/', auth, routes);
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
+app.use('*', () => {
+  throw new NotFoundError('Запрашиваемый ресурс не найден');
 });
 
 // Централизованный обработчик ошибок
