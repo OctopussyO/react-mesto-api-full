@@ -2,12 +2,15 @@ const router = require('express').Router();
 const celebrate = require('../middlewares/celebrate-validator');
 const {
   getUsers,
+  getOwnerData,
   getUser,
   updateUserData,
   updateUserAvatar,
 } = require('../controllers/users');
 
 router.get('/users', getUsers);
+
+router.get('/users/me', getOwnerData);
 
 router.get('/users/:id', celebrate.getUser, getUser);
 

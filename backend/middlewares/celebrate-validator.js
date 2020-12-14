@@ -21,7 +21,7 @@ const createCard = celebrate({
   }),
 }, {
   messages: {
-    'string.pattern.base': 'Your {#label} does not matche the suggested pattern',
+    'string.pattern.base': 'Your {#label} does not match the suggested pattern',
   },
 });
 
@@ -46,11 +46,11 @@ const updateUserData = celebrate({
 
 const updateUserAvatar = celebrate({
   body: Joi.object().keys({
-    link: Joi.string().required().pattern(urlRegex),
+    avatar: Joi.string().required().pattern(urlRegex),
   }),
 }, {
   messages: {
-    'string.pattern.base': 'Your {#label} does not matche the suggested pattern',
+    'string.pattern.base': 'Your {#label} does not match the suggested pattern',
   },
 });
 

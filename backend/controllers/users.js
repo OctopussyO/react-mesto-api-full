@@ -49,10 +49,17 @@ module.exports.createUser = (req, res, next) => {
     });
 };
 
+module.exports.getOwnerData = (req, res, next) => {
+  User.findById(req.user.id)
+    .orFail(new NotFoundError('Нет такого пользователя'))
+    .then((user) => res.send(user))
+    .catch(next);
+};
+
 module.exports.updateUserData = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
-    req.user._id,
+    req.user.id,
     { name, about },
     {
       new: true,
@@ -67,7 +74,7 @@ module.exports.updateUserData = (req, res, next) => {
 module.exports.updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
-    req.user._id,
+    req.user.id,
     { avatar },
     {
       new: true,
