@@ -1,13 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { handleCelebrateError } = require('./middlewares/celebrate-error-handler');
 const routes = require('./routes/index');
-const { auth } = require('./middlewares/auth');
-const { createUser, login } = require('./controllers/users');
-const NotFoundError = require('./errors/not-found-error');
-const { errorHandler } = require('./middlewares/error-handler');
-const celebrate = require('./middlewares/celebrate-validator');
 
 const { PORT = 3000 } = process.env;
 
@@ -28,19 +22,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 
-app.post('/signup', celebrate.signup, createUser);
-
-app.post('/signin', celebrate.signin, login);
-
-app.use('/', auth, routes);
-app.use('*', () => {
-  throw new NotFoundError('Запрашиваемый ресурс не найден');
-});
-
-// Обработчик ошибок celebrate
-app.use(handleCelebrateError);
-
-// Централизованный обработчик ошибок
-app.use(errorHandler);
+app.use('/', routes);
 
 app.listen(PORT);
