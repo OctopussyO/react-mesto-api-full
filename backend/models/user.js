@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const isEmail = require('validator/lib/isEmail');
 const urlRegex = require('../utils/urlRegex');
-const { UnauthorizedError } = require('../errors');
+const UnauthorizedError = require('../errors/unauthorized-error');
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
   about: {
     type: String,
     minlength: [2, 'Это поле должно содержать не менее 2 символов'],
-    maxlength: [30, 'Это поле должно содержать не менее 30 символов'],
+    maxlength: [30, 'Это поле должно содержать не более 30 символов'],
     default: 'Исследователь',
   },
   avatar: {
