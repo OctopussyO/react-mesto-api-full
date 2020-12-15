@@ -41,43 +41,44 @@ function App() {
     email: ''
   });
   
+  const tokenCheck = () => {
+    const token = localStorage.getItem('token');
+    
+    if (token) {
+      api.getOwnerData(token)
+      .then((res) => {
+        if (res.email) {
+          setUserData({email: res.email});
+          setLoggedIn(true);
+          history.push('/');
+        }
+      })
+      .catch((err) => {
+        // Здесь ошибку пользователю не выводим, потому что в редких случаях она ему что-то даст.
+        // Тот, кому это необходимо, найдёт её в консоли.
+        // Вывод ошибки здесь выглядит странно, потому что пользователь даже не поймёт, в чём дело
+        // -- зашёл на сайт, ещё ничего не сделал, а уже ошибка.
+        console.error(err);
+      })
+    }
+  }
+
   // При загрузке страницы сразу проверяем, авторизован ли пользователь
   useEffect(() => {
     tokenCheck();
   }, []);
-
-  const tokenCheck = () => {
-    const token = localStorage.getItem('token');
-
-    if (token) {
-      api.getOwnerData(token)
-      .then((res) => {
-          if (res.email) {
-            setUserData({email: res.email});
-            setLoggedIn(true);
-            history.push('/');
-          }
-        })
-        .catch((err) => {
-          // Здесь ошибку пользователю не выводим, потому что в редких случаях она ему что-то даст.
-          // Тот, кому это необходимо, найдёт её в консоли.
-          // Вывод ошибки здесь выглядит странно, потому что пользователь даже не поймёт, в чём дело
-          // -- зашёл на чсайт, ещё ничего не сделал, а уже ошибка.
-          console.error(err);
-        })
-      }
-    }
-    
+  
   // Загрузка пользовательских данных с сервера
   useEffect(() => {
     const token = localStorage.getItem('token');
-
+    
     api.getOwnerData(token)
-      .then((userData) => {
+    .then((userData) => {
         setCurrentUser(userData);
         api.getData(token)
           .then((cardsData) => {
             setCards(cardsData.reverse());
+            setResponseState(true);
           }, (err) => {
             if (err.status === 404) {
               setResponseState(true);
