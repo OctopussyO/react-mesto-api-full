@@ -74,30 +74,30 @@ function App() {
     
     api.getOwnerData(token)
     .then((userData) => {
-        setCurrentUser(userData);
-        api.getData(token)
-          .then((cardsData) => {
-            setCards(cardsData.reverse());
-            setResponseState(true);
-          }, (err) => {
-            if (err.status === 404) {
-              setResponseState(true);
-            }
-          })
-      })
-      .catch((err) => {
-        if (err.status === 401) {
+      setCurrentUser(userData);
+      api.getData(token)
+        .then((cardsData) => {
+          setCards(cardsData.reverse());
           setResponseState(true);
-        } else {
-          setResponseError({
-            status: err.status,
-            statusText: err.statusText
-          });
-        }
-      })
-      .finally(() => {
-        setLoadingState(false);
-      });
+        }, (err) => {
+          if (err.status === 404) {
+            setResponseState(true);
+          }
+        })
+    })
+    .catch((err) => {
+      if (err.status === 401) {
+        setResponseState(true);
+      } else {
+        setResponseError({
+          status: err.status,
+          statusText: err.statusText
+        });
+      }
+    })
+    .finally(() => {
+      setLoadingState(false);
+    });
   }, [loggedIn]);
 
   // Стейт-переменная для определения контента тултипа
