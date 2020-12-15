@@ -13,7 +13,8 @@ function Form ({
   submitLoadingTitle,
   isSubmitActive,
   onSubmit,
-  isInfoTooltipOpen
+  isInfoTooltipOpen,
+  isPopupOpen,
 }) {
   const formClassName = cn(
     'form',
@@ -42,9 +43,10 @@ function Form ({
 
   // Для случаев, когда появляется тултип с результатом отправки формы,
   // обнуляем стейт кнопки отправки формы, чтобы убрать прелоадер.
+  // Также при закрытии/открытии попапа убираем прелоадер.
   useEffect(() => {
-    setSubmitState(false);
-  }, [isInfoTooltipOpen]);
+    setTimeout(() => { setSubmitState(false); }, 300);
+  }, [isInfoTooltipOpen, isPopupOpen]);
 
   // Используем пользовательский хук валидации формы
   let { isSubmitValid } = useFormValidation({ formRef, isSubmitActive });

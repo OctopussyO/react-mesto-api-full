@@ -31,6 +31,7 @@ function PopupWithForm({
         onSubmit={onSubmit}
         name={name}
         title={title}
+        isPopupOpen={isOpen}
       >
         {children}
       </Form>

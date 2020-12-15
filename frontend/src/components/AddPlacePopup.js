@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import cn from 'classnames';
 import FormInputWithError from "./FormInputWithError";
 import PopupWithForm from "./PopupWithForm";
@@ -17,6 +17,11 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
   const [place, setPlace] = useState('');
   const [link, setLink] = useState('');
 
+  useEffect(() => {
+    setPlace('');
+    setLink('');
+  }, [isOpen]);
+
   const handlePlaceChange = (e) => {
     setPlace(e.target.value);
   };
@@ -30,8 +35,6 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
       name: place,
       link,
     });
-    setPlace('');
-    setLink('');
   };
 
   return (

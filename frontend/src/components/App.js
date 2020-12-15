@@ -98,28 +98,6 @@ function App() {
       .finally(() => {
         setLoadingState(false);
       });
-    // Promise.all([api.getOwnerData(token), api.getData(token)])
-    //   .then(([userData, cardsData]) => {
-    //     setCurrentUser(userData);
-    //     setCards(cardsData.reverse());
-    //     setResponseState(true);
-    //     console.log('here')
-    //   }, (res) => {
-    //     console.log(res)
-    //   })
-    //   .catch((err) => {console.log(err)
-    //     if (err.status === 401) {
-    //       setResponseState(true);
-    //     } else {
-    //       setResponseError({
-    //         status: err.status,
-    //         statusText: err.statusText
-    //       });
-    //     }
-    //   })
-    //   .finally(() => {
-    //     setLoadingState(false);
-    //   });
   }, [loggedIn]);
 
   // Стейт-переменная для определения контента тултипа
@@ -233,7 +211,10 @@ function App() {
         setCurrentUser(userData);
       })
       .catch((err) => {
-        alert(err);
+        if (err.status === 400) {
+          setInfoTooltipMessage('Переданные данные не прошли валидацию')
+        }
+        handleNotSuccessResponse();
       })
       .finally(() => {
         closeAllPopups();
@@ -248,7 +229,10 @@ function App() {
         setCurrentUser(userData);
       })
       .catch((err) => {
-        alert(err);
+        if (err.status === 400) {
+          setInfoTooltipMessage('Переданные данные не прошли валидацию')
+        }
+        handleNotSuccessResponse();
       })
       .finally(() => {
         closeAllPopups();
@@ -263,7 +247,10 @@ function App() {
         setCards([newCard, ...cards]);
       })
       .catch((err) => {
-        alert(err);
+        if (err.status === 400) {
+          setInfoTooltipMessage('Переданные данные не прошли валидацию')
+        }
+        handleNotSuccessResponse();
       })
       .finally(() => {
         closeAllPopups();
@@ -284,8 +271,8 @@ function App() {
         );
         setCards(newCards);
       })
-      .catch((err) => {
-        alert(err);
+      .catch(() => {
+        handleNotSuccessResponse();
       });
   };
 
@@ -301,8 +288,8 @@ function App() {
     .then(() => {
       const newCards = cards.filter((cardItem) => cardItem._id !== card._id);
       setCards(newCards);
-    }).catch((err) => {
-      alert(err);
+    }).catch(() => {
+      handleNotSuccessResponse();
     }).finally(() => {
       closeAllPopups();
     });    
