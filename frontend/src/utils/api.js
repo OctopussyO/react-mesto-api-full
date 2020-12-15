@@ -1,72 +1,123 @@
-import { apiConfig } from "./utils";
+import { BASE_URL } from "./utils";
 
 class Api {
   constructor(options) {
     this._baseUrl = options.baseUrl;
-    this._headers = options.headers;
-    this._contentType = options.headers["Content-Type"];
   }
 
   _handleResponse(res) {
     return (res.ok) ? res.json() : Promise.reject(res);
   }
 
-  getUserData() {
+  register(data) {
+    return fetch(`${this._baseUrl}/signup`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data),
+    })
+      .then(this._handleResponse);
+  }
+
+  login(data) {
+    return fetch(`${this._baseUrl}/signin`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data),
+    })
+      .then(this._handleResponse);
+  }
+
+  getOwnerData(token) {
     return fetch(`${this._baseUrl}/users/me`, {
-      headers: this._headers,
-    }).then(this._handleResponse);
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+    })
+      .then(this._handleResponse);
   }
 
-  getData() {
+  // getUserData() {
+  //   return fetch(`${this._baseUrl}/users/me`, {
+  //     headers: this._headers,
+  //   }).then(this._handleResponse);
+  // }
+
+  getData(token) {
     return fetch(`${this._baseUrl}/cards`, {
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
     }).then(this._handleResponse);
   }
 
-  saveUserData(data) {
+  saveUserData(token, data) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "PATCH",
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify(data),
     }).then(this._handleResponse);
   }
 
-  saveUserAvatar(data) {
+  saveUserAvatar(token, data) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: "PATCH",
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify(data),
     }).then(this._handleResponse);
   }
 
-  saveNewItem(data) {
+  saveNewItem(token, data) {
     return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify(data),
     }).then(this._handleResponse);
   }
 
-  likeItem(itemId) {
-    return fetch(`${this._baseUrl}/cards/likes/${itemId}`, {
+  likeItem(token, itemId) {
+    return fetch(`${this._baseUrl}/cards/${itemId}/likes`, {
       method: "PUT",
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
     }).then(this._handleResponse);
   }
 
-  unlikeItem(itemId) {
-    return fetch(`${this._baseUrl}/cards/likes/${itemId}`, {
+  unlikeItem(token, itemId) {
+    return fetch(`${this._baseUrl}/cards/${itemId}/likes`, {
       method: "DELETE",
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
     }).then(this._handleResponse);
   }
 
-  deleteItem(itemId) {
+  deleteItem(token, itemId) {
     return fetch(`${this._baseUrl}/cards/${itemId}`, {
       method: "DELETE",
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
     }).then(this._handleResponse);
   }
 }
 
-export const api = new Api(apiConfig);
+export const api = new Api({ baseUrl: BASE_URL });

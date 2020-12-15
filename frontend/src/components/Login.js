@@ -23,7 +23,7 @@ function Login ({ onLogin, loggedIn, isInfoTooltipOpen }) {
     if (loggedIn) {
       history.push('/');
     }
-  }, []);
+  }, [loggedIn]);
 
   const [data, setData] = useState({
     email: '',

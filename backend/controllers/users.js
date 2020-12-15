@@ -44,9 +44,8 @@ module.exports.createUser = (req, res, next) => {
             avatar: newUser.avatar,
             email: newUser.email,
           });
-        })
-        .catch(next);
-    });
+        });
+    }).catch(next);
 };
 
 module.exports.getOwnerData = (req, res, next) => {
