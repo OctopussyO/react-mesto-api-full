@@ -1,85 +1,101 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const { SALT_ROUND } = require('../configs');
+const { getJwt } = require('../utils/jwt');
+const { BadRequestError, NotFoundError, ConflictError } = require('../errors');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find()
+    .orFail(new NotFoundError('Невозможно получить список пользователей'))
     .then((data) => res.send(data))
-    .catch(() => {
-      res.status(500).send({ message: 'Ошибка на сервере' });
-    });
+    .catch(next);
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   const { id } = req.params;
   User.findById(id)
-    .orFail(new Error('NotExistId'))
+    .orFail(new NotFoundError('Пользователя с таким id не существует'))
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.message === 'NotExistId') {
-        res.status(404).send({ message: 'Нет пользователя с таким id' });
-      } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Введён неверный id' });
-      } else {
-        res.status(500).send({ message: 'Ошибка на сервере' });
-      }
-    });
+    .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
-  User.create({ ...req.body })
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Введённые данные не прошли валидацию' });
+module.exports.createUser = (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password || !password.trim()) {
+    throw new BadRequestError('Введены невалидные данные');
+  }
+
+  return User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        throw new ConflictError('Пользователь с таким email уже существует');
       }
-      return res.status(500).send({ message: 'Ошибка на сервере' });
-    });
+
+      return bcrypt.hash(password, SALT_ROUND);
+    })
+    .then((hash) => {
+      User.create({ email, password: hash })
+        .then((newUser) => {
+          res.status(200).send({
+            _id: newUser._id,
+            name: newUser.name,
+            about: newUser.about,
+            avatar: newUser.avatar,
+            email: newUser.email,
+          });
+        });
+    }).catch(next);
 };
 
-module.exports.updateUserData = (req, res) => {
+module.exports.getOwnerData = (req, res, next) => {
+  User.findById(req.user.id)
+    .orFail(new NotFoundError('Нет такого пользователя'))
+    .then((user) => res.send(user))
+    .catch(next);
+};
+
+module.exports.updateUserData = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
-    req.user._id,
+    req.user.id,
     { name, about },
     {
       new: true,
       runValidators: true,
     },
   )
-    .orFail(new Error('NotExistId'))
+    .orFail(new NotFoundError('Пользователя с таким id не существует'))
     .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.message === 'NotExistId') {
-        res.status(404).send({ message: 'Пользователя с таким id не существует' });
-      } else if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Введённые данные не прошли валидацию' });
-      } else {
-        res.status(500).send({ message: 'Ошибка на сервере' });
-      }
-    });
+    .catch(next);
 };
 
-module.exports.updateUserAvatar = (req, res) => {
+module.exports.updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
-    req.user._id,
+    req.user.id,
     { avatar },
     {
-      // Флаг new позволяет вернуть обновлённые данные, а не создаёт нового пользователя.
-      // Для создания нового пользователя при его отсутствии потребовалось бы использовать
-      // флаг upsert
       new: true,
       runValidators: true,
     },
   )
-    .orFail(new Error('NotExistId'))
+    .orFail(new NotFoundError('Пользователя с таким id не существует'))
     .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.message === 'NotExistId') {
-        res.status(404).send({ message: 'Пользователя с таким id не существует' });
-      } else if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Введённые данные не прошли валидацию' });
-      } else {
-        res.status(500).send({ message: 'Ошибка на сервере' });
-      }
-    });
+    .catch(next);
+};
+
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password || !password.trim()) {
+    throw new BadRequestError('Введены невалидные данные');
+  }
+
+  return User.findUserByCredentials({ email, password })
+    .then((foundUser) => {
+      const token = getJwt(foundUser._id);
+      return res.status(200).send({ token });
+    })
+    .catch(next);
 };

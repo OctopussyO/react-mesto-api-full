@@ -16,7 +16,6 @@ import Register from "./Register";
 import ProtectedRoute from "./ProtectedRoute";
 import InfoTooltip from "./InfoTooltip";
 import ResponseError from "./ResponseError";
-import { auth } from "../utils/auth";
 
 function App() {
   // Логика загрузки (показываем/убираем спиннер, отрисовываем ошибку при необходимости)
@@ -32,58 +31,74 @@ function App() {
   let contentClassName = cn('content', {'content_hidden': !wasResponse});
   let responseErrorClassName = cn('response-error', {'response-error_hidden': wasResponse});
 
-  // Загрузка пользовательских данных с сервера
-  useEffect(() => {
-    Promise.all([api.getUserData(), api.getData()])
-      .then(([userData, cardsData]) => {
-        setCurrentUser(userData);
-        setCards(cardsData);
-        setResponseState(true);
-      })
-      .catch((err) => {
-        setResponseError({
-          status: err.status,
-          statusText: err.statusText
-        });
-      })
-      .finally(() => {
-        setLoadingState(false);
-      });
-  }, []);
-
+  
   // Авторизация пользователя
   const history = useHistory();
-
+  
   const [loggedIn, setLoggedIn] = useState(false);
-
+  
   const [userData, setUserData] = useState({
     email: ''
   });
+  
+  const tokenCheck = () => {
+    const token = localStorage.getItem('token');
+    
+    if (token) {
+      api.getOwnerData(token)
+      .then((res) => {
+        if (res.email) {
+          setUserData({email: res.email});
+          setLoggedIn(true);
+          history.push('/');
+        }
+      })
+      .catch((err) => {
+        // Здесь ошибку пользователю не выводим, потому что в редких случаях она ему что-то даст.
+        // Тот, кому это необходимо, найдёт её в консоли.
+        // Вывод ошибки здесь выглядит странно, потому что пользователь даже не поймёт, в чём дело
+        // -- зашёл на сайт, ещё ничего не сделал, а уже ошибка.
+        console.error(err);
+      })
+    }
+  }
 
   // При загрузке страницы сразу проверяем, авторизован ли пользователь
   useEffect(() => {
     tokenCheck();
   }, []);
-
-  const tokenCheck = () => {
+  
+  // Загрузка пользовательских данных с сервера
+  useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
-      auth.getContent(token)
-        .then((res) => {
-          if (res.data) {
-            setUserData({email: res.data.email});
-            setLoggedIn(true);
+    
+    api.getOwnerData(token)
+    .then((userData) => {
+      setCurrentUser(userData);
+      api.getData(token)
+        .then((cardsData) => {
+          setCards(cardsData.reverse());
+          setResponseState(true);
+        }, (err) => {
+          if (err.status === 404) {
+            setResponseState(true);
           }
         })
-        .catch((err) => {
-          // Здесь ошибку пользователю не выводим, потому что в редких случаях она ему что-то даст.
-          // Тот, кому это необходимо, найдёт её в консоли.
-          // Вывод ошибки здесь выглядит странно, потому что пользователь даже не поймёт, в чём дело
-          // -- зашёл на чсайт, ещё ничего не сделал, а уже ошибка.
-          console.error(err);
-        })
-    }
-  }
+    })
+    .catch((err) => {
+      if (err.status === 401) {
+        setResponseState(true);
+      } else {
+        setResponseError({
+          status: err.status,
+          statusText: err.statusText
+        });
+      }
+    })
+    .finally(() => {
+      setLoadingState(false);
+    });
+  }, [loggedIn]);
 
   // Стейт-переменная для определения контента тултипа
   const [isSuccess, setSuccess] = useState(true);
@@ -95,9 +110,9 @@ function App() {
   }
 
   const handleRegister = ({ email, password }) => {
-    auth.register({ email, password })
-      .then((res) => {
-        if (res.data.email) {
+    api.register({ email, password })
+    .then((res) => {
+        if (res.email) {
           setSuccess(true);
           setInfoTooltipState(true);
           history.push('/sign-in');
@@ -106,19 +121,20 @@ function App() {
       .catch((err) => {
         if (err.status === 400) {
           setInfoTooltipMessage('Некорректно заполнено одно из полей.');
+        } else if (err.status === 409) {
+          setInfoTooltipMessage('Пользователь с таким email уже существует.')
         }
         handleNotSuccessResponse();
       })
   }
 
   const handleLogin = ({ email, password }) => {
-    auth.login({ email, password })
+    api.login({ email, password })
       .then((data) => {
         if (data.token) {
           localStorage.setItem('token', data.token);
           setUserData({email: email});
           setLoggedIn(true);
-          history.push('/');
         }
       })
       .catch((err) => {
@@ -179,7 +195,7 @@ function App() {
   const [selectedCard, setSelectedCard] = useState({});
 
   const [currentUser, setCurrentUser] = useState({
-    name: "КУку",
+    name: "",
     about: "",
     avatar: "",
   });
@@ -188,12 +204,17 @@ function App() {
 
   // Обработчики для попапов
   const handleUpdateUser = (userData) => {
-    api.saveUserData(userData)
+    const token = localStorage.getItem('token');
+
+    api.saveUserData(token, userData)
       .then((userData) => {
         setCurrentUser(userData);
       })
       .catch((err) => {
-        alert(err);
+        if (err.status === 400) {
+          setInfoTooltipMessage('Переданные данные не прошли валидацию')
+        }
+        handleNotSuccessResponse();
       })
       .finally(() => {
         closeAllPopups();
@@ -201,12 +222,17 @@ function App() {
   };
 
   const handleUpdateAvatar = (data) => {
-    api.saveUserAvatar(data)
+    const token = localStorage.getItem('token');
+
+    api.saveUserAvatar(token, data)
       .then((userData) => {
         setCurrentUser(userData);
       })
       .catch((err) => {
-        alert(err);
+        if (err.status === 400) {
+          setInfoTooltipMessage('Переданные данные не прошли валидацию')
+        }
+        handleNotSuccessResponse();
       })
       .finally(() => {
         closeAllPopups();
@@ -214,12 +240,17 @@ function App() {
   };
 
   const handleAddPlace = (newCard) => {
-    api.saveNewItem(newCard)
+    const token = localStorage.getItem('token');
+
+    api.saveNewItem(token, newCard)
       .then((newCard) => {
         setCards([newCard, ...cards]);
       })
       .catch((err) => {
-        alert(err);
+        if (err.status === 400) {
+          setInfoTooltipMessage('Переданные данные не прошли валидацию')
+        }
+        handleNotSuccessResponse();
       })
       .finally(() => {
         closeAllPopups();
@@ -228,18 +259,20 @@ function App() {
 
   // Обработчики для карточек
   const handleCardLike = (isLiked, card) => {
+    const token = localStorage.getItem('token');
+
     const handleLikeClick = isLiked
       ? api.unlikeItem.bind(api)
       : api.likeItem.bind(api);
-    handleLikeClick(card._id, !isLiked)
+    handleLikeClick(token, card._id, !isLiked)
       .then((newCard) => {
         const newCards = cards.map((cardItem) =>
           cardItem._id === card._id ? newCard : cardItem
         );
         setCards(newCards);
       })
-      .catch((err) => {
-        alert(err);
+      .catch(() => {
+        handleNotSuccessResponse();
       });
   };
 
@@ -249,12 +282,14 @@ function App() {
   };
   
   const handleConfirmDelete = (card) => {
-    api.deleteItem(card._id)
+    const token = localStorage.getItem('token');
+
+    api.deleteItem(token, card._id)
     .then(() => {
       const newCards = cards.filter((cardItem) => cardItem._id !== card._id);
       setCards(newCards);
-    }).catch((err) => {
-      alert(err);
+    }).catch(() => {
+      handleNotSuccessResponse();
     }).finally(() => {
       closeAllPopups();
     });    

@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const routes = require('./routes/index');
 
 const { PORT = 3000 } = process.env;
@@ -22,18 +23,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 
-// Временное решение для авторизации пользователя
-app.use((req, res, next) => {
-  req.user = {
-    _id: '5fb97473c1649e3bac972675',
-  };
-
-  next();
-});
+app.use(cors());
 
 app.use('/', routes);
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
-});
 
 app.listen(PORT);

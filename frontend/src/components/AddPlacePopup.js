@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import cn from 'classnames';
 import FormInputWithError from "./FormInputWithError";
 import PopupWithForm from "./PopupWithForm";
 
 function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
-  const themeModificator = "light";
-  const actModificator = "activity";
+  const themeModificator = 'light';
+  const actModificator = 'activity';
 
   const fieldsetClassName = cn(
     'form__fieldset',
@@ -14,8 +14,13 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
   );
 
   // Стейт-переменные для управляемых компонентов
-  const [place, setPlace] = useState("");
-  const [link, setLink] = useState("");
+  const [place, setPlace] = useState('');
+  const [link, setLink] = useState('');
+
+  useEffect(() => {
+    setPlace('');
+    setLink('');
+  }, [isOpen]);
 
   const handlePlaceChange = (e) => {
     setPlace(e.target.value);
@@ -25,8 +30,8 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
     setLink(e.target.value);
   };
 
-  const handleSubmit = () => {
-    onAddPlace({
+  const handleSubmit = async () => {
+    await onAddPlace({
       name: place,
       link,
     });
