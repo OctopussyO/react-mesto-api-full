@@ -79,10 +79,6 @@ function App() {
         .then((cardsData) => {
           setCards(cardsData.reverse());
           setResponseState(true);
-        }, (err) => {
-          if (err.status === 404) {
-            setResponseState(true);
-          }
         })
     })
     .catch((err) => {

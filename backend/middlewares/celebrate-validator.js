@@ -7,13 +7,6 @@ const joiIdOptions = {
   }),
 };
 
-const joiCredentialsOptions = {
-  body: Joi.object().keys({
-    email: Joi.string().email().required(),
-    password: Joi.string().min(6).required(),
-  }),
-};
-
 const createCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
@@ -31,9 +24,22 @@ const likeCard = celebrate(joiIdOptions);
 
 const dislikeCard = celebrate(joiIdOptions);
 
-const signup = celebrate(joiCredentialsOptions);
+const signup = celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().pattern(urlRegex),
+  }),
+});
 
-const signin = celebrate(joiCredentialsOptions);
+const signin = celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+  }),
+});
 
 const getUser = celebrate(joiIdOptions);
 
