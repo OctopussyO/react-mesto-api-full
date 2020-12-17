@@ -3,7 +3,6 @@ const Card = require('../models/card');
 
 module.exports.getCards = (req, res, next) => {
   Card.find()
-    .orFail(new NotFoundError('Невозможно получить список карточек'))
     .then((data) => res.send(data))
     .catch(next);
 };
@@ -18,7 +17,10 @@ module.exports.deleteCard = (req, res, next) => {
   const userId = req.user.id;
   const cardId = req.params.id;
 
+  // При том способе, который был описан в комментарии ревью, postman выводил
+  // ошибку 'Карточка принадлежит другому пользователю', но карточка всё равно удалялась.
   Card.findById(cardId)
+    .orFail(new NotFoundError('Нет карточки с таким id'))
     .then((card) => {
       const cardOwnerId = card.owner.toString();
 
@@ -27,10 +29,9 @@ module.exports.deleteCard = (req, res, next) => {
       }
 
       return Card.findByIdAndRemove(cardId)
-        .orFail(new NotFoundError('Нет карточки с таким id'))
-        .then((deletedCard) => res.status(200).send(deletedCard))
-        .catch(next);
-    });
+        .then((deletedCard) => res.status(200).send(deletedCard));
+    })
+    .catch(next);
 };
 
 module.exports.likeCard = (req, res, next) => {
